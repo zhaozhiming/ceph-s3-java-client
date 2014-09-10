@@ -1,7 +1,37 @@
 apply plugin: "java"
 apply plugin: "idea"
 
+compileJava {
+    sourceCompatibility = 1.6
+    targetCompatibility = 1.6
+}
+
+repositories {
+    maven {
+        url "http://maven.oschina.net/content/groups/public/"
+    }
+}
+
 dependencies {
     compile files('./lib/aws-java-sdk-1.8.9.1.jar')
     compile files('./lib/aws-java-sdk-flow-build-tools-1.8.9.1.jar')
+
+    //logging
+    compile 'commons-logging:commons-logging:1.2'
+
+    //json
+    compile "com.fasterxml.jackson.core:jackson-databind:2.2.3"
+    compile "org.codehaus.jackson:jackson-mapper-asl:1.9.13"
+    compile "org.codehaus.jackson:jackson-core-asl:1.9.13"
+
+    //http
+    compile 'org.apache.httpcomponents:httpclient:4.3.5'
+
+    //other
+    compile "com.google.guava:guava:16.0"
+    compile "joda-time:joda-time:2.3"
+
+    //testing
+    testCompile "junit:junit:4.11"
+    testCompile "org.hamcrest:hamcrest-core:1.3"
 }

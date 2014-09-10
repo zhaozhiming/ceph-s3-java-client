@@ -20,6 +20,12 @@ public class RadosGatewayS3Client {
     private String secretKey;
     private String hostname;
 
+    public RadosGatewayS3Client(String accessKey, String secretKey, String hostname) {
+        this.accessKey = accessKey;
+        this.secretKey = secretKey;
+        this.hostname = hostname;
+    }
+
     public AmazonS3 createConnect() {
         AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         AmazonS3 conn = new AmazonS3Client(credentials);
@@ -37,8 +43,8 @@ public class RadosGatewayS3Client {
         return buckets;
     }
 
-    public Bucket createBucket() {
-        return createConnect().createBucket("bucket1");
+    public Bucket createBucket(String bucketName) {
+        return createConnect().createBucket(bucketName);
     }
 
     public ObjectListing listObjects(Bucket bucket) {
