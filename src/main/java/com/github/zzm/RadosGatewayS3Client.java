@@ -39,22 +39,26 @@ public class RadosGatewayS3Client {
 
     public ObjectListing listObjects(Bucket bucket) {
         AmazonS3 connect = createConnect();
-        ObjectListing objects = connect.listObjects(bucket.getName());
-        do {
-            for (S3ObjectSummary objectSummary : objects.getObjectSummaries()) {
-                System.out.println(objectSummary.getKey() + "\t" +
-                        objectSummary.getSize() + "\t" +
-                        StringUtils.fromDate(objectSummary.getLastModified()));
-            }
-            objects = connect.listNextBatchOfObjects(objects);
-        } while (objects.isTruncated());
-
-        return objects;
+        return connect.listObjects(bucket.getName());
     }
 
     public PutObjectResult putObject(File file, Bucket bucket) throws FileNotFoundException {
         return createConnect().putObject(
                 bucket.getName(), file.getName(), new FileInputStream(file), new ObjectMetadata());
+    }
+
+    public S3Object getObject(String bucketName, String objectName) {
+        return createConnect().getObject(bucketName, objectName);
+    }
+
+    public Bucket getBucket(String bucketName) {
+        List<Bucket> buckets = listBuckets();
+        for (Bucket bucket : buckets) {
+            if (bucketName.equals(bucket.getName())) {
+                return bucket;
+            }
+        }
+        throw new RuntimeException("Bucket not found");
     }
 
     private AmazonS3 createConnect() {
