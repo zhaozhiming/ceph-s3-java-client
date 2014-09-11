@@ -47,6 +47,10 @@ public class RadosGatewayS3Client {
         return createConnect().getObject(new GetObjectRequest(bucketName, objectName), downloadFile);
     }
 
+    public void deleteObject(String bucketName, String fileName) {
+        createConnect().deleteObject(bucketName, fileName);
+    }
+
     public Bucket getBucket(String bucketName) {
         List<Bucket> buckets = listBuckets();
         for (Bucket bucket : buckets) {

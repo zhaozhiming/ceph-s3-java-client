@@ -1,6 +1,9 @@
 package com.github.zzm;
 
-import com.amazonaws.services.s3.model.*;
+import com.amazonaws.services.s3.model.Bucket;
+import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,8 +29,7 @@ public class RadosGatewayS3ClientTest {
 
     @Before
     public void setUp() throws Exception {
-        client = new RadosGatewayS3Client(
-                ACCESS_KEY, SECRET_KEY, HOSTNAME);
+        client = new RadosGatewayS3Client(ACCESS_KEY, SECRET_KEY, HOSTNAME);
     }
 
     @Test
@@ -49,29 +51,53 @@ public class RadosGatewayS3ClientTest {
         client.putObject(new File(String.format("upload%s%s", File.separator, FILE_NAME)), client.getBucket(BUCKET_NAME));
 
         assertThat(client.getObject(BUCKET_NAME, FILE_NAME).getKey(), is(FILE_NAME));
+
+        client.deleteObject(BUCKET_NAME, FILE_NAME);
     }
 
     @Test
-    public void should_list_objecs_correct() throws Exception {
+    public void should_list_objects_correct() throws Exception {
+        client.putObject(new File(String.format("upload%s%s", File.separator, FILE_NAME)), client.getBucket(BUCKET_NAME));
+
         ObjectListing objectListing = client.listObjects(client.getBucket(BUCKET_NAME));
         List<S3ObjectSummary> objects = objectListing.getObjectSummaries();
         assertThat(objects.size(), is(1));
         assertThat(objects.get(0).getKey(), is(FILE_NAME));
         assertThat(objects.get(0).getSize(), is(12L));
+
+        client.deleteObject(BUCKET_NAME, FILE_NAME);
     }
 
     @Test
     public void should_get_object_correct() throws Exception {
+        client.putObject(new File(String.format("upload%s%s", File.separator, FILE_NAME)), client.getBucket(BUCKET_NAME));
+
         S3Object object = client.getObject(BUCKET_NAME, FILE_NAME);
+
         assertThat(object.getKey(), is(FILE_NAME));
+
+        client.deleteObject(BUCKET_NAME, FILE_NAME);
     }
 
     @Test
     public void should_download_object_correct() throws Exception {
+        client.putObject(new File(String.format("upload%s%s", File.separator, FILE_NAME)), client.getBucket(BUCKET_NAME));
+
         File downloadFile = tempFolder.newFile(FILE_NAME);
         client.downloadObject(BUCKET_NAME, FILE_NAME, downloadFile);
 
         assertThat(downloadFile.exists(), is(true));
         assertThat(downloadFile.length(), is(12L));
+
+        client.deleteObject(BUCKET_NAME, FILE_NAME);
+    }
+
+    @Test
+    public void should_delete_object_correct() throws Exception {
+        client.putObject(new File(String.format("upload%s%s", File.separator, FILE_NAME)), client.getBucket(BUCKET_NAME));
+
+        client.deleteObject(BUCKET_NAME, FILE_NAME);
+
+        assertThat(client.listObjects(client.getBucket(BUCKET_NAME)).getObjectSummaries().size(), is(0));
     }
 }
