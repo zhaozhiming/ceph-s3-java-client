@@ -5,7 +5,6 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
-import com.amazonaws.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,13 +23,7 @@ public class RadosGatewayS3Client {
     }
 
     public List<Bucket> listBuckets() {
-        AmazonS3 connect = createConnect();
-        List<Bucket> buckets = connect.listBuckets();
-        for (Bucket bucket : buckets) {
-            System.out.println(bucket.getName() + "\t" +
-                    StringUtils.fromDate(bucket.getCreationDate()));
-        }
-        return buckets;
+        return createConnect().listBuckets();
     }
 
     public Bucket createBucket(String bucketName) {
@@ -38,8 +31,7 @@ public class RadosGatewayS3Client {
     }
 
     public ObjectListing listObjects(Bucket bucket) {
-        AmazonS3 connect = createConnect();
-        return connect.listObjects(bucket.getName());
+        return createConnect().listObjects(bucket.getName());
     }
 
     public PutObjectResult putObject(File file, Bucket bucket) throws FileNotFoundException {
@@ -51,6 +43,10 @@ public class RadosGatewayS3Client {
         return createConnect().getObject(bucketName, objectName);
     }
 
+    public ObjectMetadata downloadObject(String bucketName, String objectName, File downloadFile) {
+        return createConnect().getObject(new GetObjectRequest(bucketName, objectName), downloadFile);
+    }
+
     public Bucket getBucket(String bucketName) {
         List<Bucket> buckets = listBuckets();
         for (Bucket bucket : buckets) {
@@ -58,7 +54,7 @@ public class RadosGatewayS3Client {
                 return bucket;
             }
         }
-        throw new RuntimeException("Bucket not found");
+        throw new RuntimeException(String.format("Bucket: %s can't be found.", bucketName));
     }
 
     private AmazonS3 createConnect() {

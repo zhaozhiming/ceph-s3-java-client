@@ -2,7 +2,9 @@ package com.github.zzm;
 
 import com.amazonaws.services.s3.model.*;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.util.List;
@@ -18,6 +20,9 @@ public class RadosGatewayS3ClientTest {
     private static final String BUCKET_NAME = "bucket1";
     private static final String FILE_NAME = "hello.txt";
     private RadosGatewayS3Client client;
+
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
 
     @Before
     public void setUp() throws Exception {
@@ -41,7 +46,7 @@ public class RadosGatewayS3ClientTest {
 
     @Test
     public void should_put_object_correct() throws Exception {
-        client.putObject(new File(String.format("upload/%s", FILE_NAME)), client.getBucket(BUCKET_NAME));
+        client.putObject(new File(String.format("upload%s%s", File.separator, FILE_NAME)), client.getBucket(BUCKET_NAME));
 
         assertThat(client.getObject(BUCKET_NAME, FILE_NAME).getKey(), is(FILE_NAME));
     }
@@ -59,5 +64,14 @@ public class RadosGatewayS3ClientTest {
     public void should_get_object_correct() throws Exception {
         S3Object object = client.getObject(BUCKET_NAME, FILE_NAME);
         assertThat(object.getKey(), is(FILE_NAME));
+    }
+
+    @Test
+    public void should_download_object_correct() throws Exception {
+        File downloadFile = tempFolder.newFile(FILE_NAME);
+        client.downloadObject(BUCKET_NAME, FILE_NAME, downloadFile);
+
+        assertThat(downloadFile.exists(), is(true));
+        assertThat(downloadFile.length(), is(12L));
     }
 }
