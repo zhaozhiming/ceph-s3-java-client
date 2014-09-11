@@ -4,6 +4,8 @@ import com.amazonaws.services.s3.model.Bucket;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -25,5 +27,15 @@ public class RadosGatewayS3ClientTest {
         Bucket bucket = client.createBucket("bucket1");
         assertThat(bucket.getName(), is("bucket1"));
     }
+
+    @Test
+    public void should_list_buckets_correct() throws Exception {
+        List<Bucket> buckets = client.listBuckets();
+        assertThat(buckets.size(), is(1));
+        assertThat(buckets.get(0).getName(), is("bucket1"));
+        assertThat(buckets.get(0).getOwner().getDisplayName(), is("zhaozhiming1"));
+    }
+
+
 
 }
