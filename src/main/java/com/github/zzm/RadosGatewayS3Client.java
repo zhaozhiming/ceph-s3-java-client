@@ -4,10 +4,7 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.Bucket;
-import com.amazonaws.services.s3.model.ObjectListing;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.StringUtils;
 
 import java.io.File;
@@ -24,13 +21,6 @@ public class RadosGatewayS3Client {
         this.accessKey = accessKey;
         this.secretKey = secretKey;
         this.hostname = hostname;
-    }
-
-    public AmazonS3 createConnect() {
-        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-        AmazonS3 conn = new AmazonS3Client(credentials);
-        conn.setEndpoint(hostname);
-        return conn;
     }
 
     public List<Bucket> listBuckets() {
@@ -62,8 +52,16 @@ public class RadosGatewayS3Client {
         return objects;
     }
 
-    public void putObject(File file, Bucket bucket) throws FileNotFoundException {
-        createConnect().putObject(bucket.getName(), file.getName(), new FileInputStream(file), new ObjectMetadata());
+    public PutObjectResult putObject(File file, Bucket bucket) throws FileNotFoundException {
+        return createConnect().putObject(
+                bucket.getName(), file.getName(), new FileInputStream(file), new ObjectMetadata());
+    }
+
+    private AmazonS3 createConnect() {
+        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+        AmazonS3 conn = new AmazonS3Client(credentials);
+        conn.setEndpoint(hostname);
+        return conn;
     }
 
 

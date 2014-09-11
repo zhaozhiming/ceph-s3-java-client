@@ -9,11 +9,15 @@ import static org.junit.Assert.assertThat;
 
 public class RadosGatewayS3ClientTest {
 
+    private static final String ACCESS_KEY = "ZGV5G0OFFUNESNRBK55Q";
+    private static final String SECRET_KEY = "8DSkRch3bnbZHtQqyES9lHH78t7UftLiSdFFzSdP";
+    private static final String HOSTNAME = "http://192.168.42.2:80";
     private RadosGatewayS3Client client;
 
     @Before
     public void setUp() throws Exception {
-        client = new RadosGatewayS3Client("ZGV5G0OFFUNESNRBK55Q", "8DSkRch3bnbZHtQqyES9lHH78t7UftLiSdFFzSdP", "ceph-rgw");
+        client = new RadosGatewayS3Client(
+                ACCESS_KEY, SECRET_KEY, HOSTNAME);
     }
 
     @Test
